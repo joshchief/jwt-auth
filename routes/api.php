@@ -4,8 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\AuthController;
-
 
 use App\Models\User;
 
@@ -20,54 +18,53 @@ use App\Models\User;
 |
 */
 
-// Route::middleware('auth')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::middleware('auth')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 // create user route
-// Route::get('/user-create', function(Request $request){
-//     $user = User::create([
-//         'name' => 'Joshua Nnamani',
-//         'email' => 'joshchief169@gmail.com',
-//         'password' => Hash::make("chinaecherem12")
-//     ]);
+Route::get('/user-create', function(Request $request){
+    $user = User::create([
+        'name' => 'Cynthia Onwuka',
+        'email' => 'chiefezege@gmail.com',
+        'password' => Hash::make("chinaecherem12")
+    ]);
 
-//     return response()->json([
-//         'new user' => $user
-//     ], 201);
-// });
-
-Route::group([
-    'middleware' => 'auth',
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'auth'
-], function(){
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+    return response()->json([
+        'new user' => $user
+    ], 201);
 });
 
 
 // login route
-// Route::post('/login', function(Request $request){
+Route::post('/login', function(){
 
-//     $credentials = $request->only('email','password');
+    $credentials = request()->only(['email', 'password']);
 
-//     if ( ! $token = Auth::attempt($credentials)){
-//         return response()->json(['error' => 'unauthorized'], 401);
-//     }
-//     return $token;
-// });
+    if ( ! $token = auth('api')->attempt($credentials)){
+        return response()->json(['error' => 'unauthorized'], 401);
+    }
+    return response()->json(['token' => $token,
+        'user' => Auth::user()
+        ], 201);
+});
 
 
 // get authenticated user info
-// Route::middleware('auth')->get('/me', function(){
-//     return response()->json(Auth::user(), 200);
-// });
+Route::get('/me', function(){
+    $user = Auth::user();
+    return $user;
+})->middleware('api');
 
-// logout use
-// Route::post('/logout', function(Request $request){
 
-//     $this->guard()->logout();
+// logout route
+Route::post('/logout', function(Request $request){
+    Auth::user();
+    return response()->json([
+        'message' => 'logout successful'
+    ]);
+});
+
 
    /*  $token = $request->header('Authorization');
 
@@ -86,7 +83,7 @@ Route::group([
             'status' => 'success',
             'message' => 'Failed Logout, please try again'
         ], 500);
-    }
+    } */
 
     /* JWTAuth::invalidate($token);
     auth('api')->logout();
@@ -101,7 +98,7 @@ Route::group([
     
     auth()->logout();
     return response()->json(['message' => 'successfully logged out']); */
-// });
+
 
 // public function logout(Request $request) { 
 //     if (! $user = auth()->setRequest($request)->user()) { 
@@ -109,4 +106,4 @@ Route::group([
 //     } 
 //     auth()->logout(); 
 //     return $this->responseSuccess('Successfully logged out.');     
-// } */
+// }
