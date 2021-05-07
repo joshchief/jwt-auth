@@ -63,4 +63,20 @@ class AuthController extends Controller
             'message' => 'logged out!'
         ]);
     }
+
+    // refresh a token
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
+    // get token array structure
+    public function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
+    }
 }
